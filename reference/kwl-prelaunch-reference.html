@@ -1,0 +1,262 @@
+<title>KWL Studio Pre-Launch</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: one centred column on near-black. Logo, buckle, name, belt, controls, signup. Only the product carries color. */
+:root{
+  --bg:#0D0D0D;--fg:#E8E5DF;--mute:#92918C;--line:#303030;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;-webkit-font-smoothing:antialiased;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 22px}
+button,input{font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit;background:none;border:0;padding:0;border-radius:0}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:1px solid var(--fg);outline-offset:5px}
+main{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
+.logo{width:110px;margin:0;color:var(--fg)}
+.logo svg{display:block;width:100%;height:auto;fill:currentColor}
+.hero{margin-top:26px;width:180px;max-width:100%;aspect-ratio:1;display:block}
+.hero svg{width:100%;height:100%;display:block;overflow:visible}
+.name{margin-top:10px;min-height:28px;padding-inline:6px}
+.name:hover{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px}
+.beltwrap{margin-top:18px;width:min(1100px,84vw);max-width:100%;transform-origin:50% 48%}
+.belt{display:block;width:100%;height:auto;overflow:visible}
+.row{display:flex;gap:30px;justify-content:center;flex-wrap:wrap}
+.cws{margin-top:22px}
+.cws button,.views button{color:var(--mute);min-height:30px}
+.cws button[aria-pressed="true"],.views button[aria-pressed="true"]{color:var(--fg);text-decoration:underline;text-underline-offset:7px;text-decoration-thickness:1px}
+.ctl{margin-top:8px;display:flex;align-items:center;gap:18px}
+.views{display:flex;gap:16px}
+.sep{width:1px;height:12px;background:var(--line)}
+.flip{min-height:30px}
+.flip .k{color:var(--mute)}
+.drop{margin-top:24px;color:var(--mute)}
+.drop b{font-weight:400;color:var(--fg)}
+form,.done{margin-top:14px;width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.field{width:100%;border-bottom:1px solid var(--line);transition:border-color .2s}
+.field:focus-within{border-color:var(--fg)}
+.field.err{border-color:#a8574d}
+.field input{width:100%;padding:9px 0;text-align:center;outline:none;cursor:text}
+.field input::placeholder{color:var(--mute)}
+.sizes{display:grid;grid-template-columns:repeat(4,1fr);width:100%}
+.sizes button{color:var(--mute);min-height:30px}
+.sizes button[aria-pressed="true"]{color:var(--fg);text-decoration:underline;text-underline-offset:7px;text-decoration-thickness:1px}
+.send{min-height:32px;padding-inline:6px}
+.send:hover{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px}
+.msg{min-height:14px;font-size:10px;color:#c98a80}
+.fine{margin:0;font-size:10px;line-height:1.6;letter-spacing:.02em;text-transform:none;color:var(--mute);text-align:center;max-width:300px}
+.done{gap:8px;min-height:120px;justify-content:center}
+.done .k{color:var(--mute)}
+footer{margin-top:30px;width:min(1100px,100%);display:flex;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;font-size:10px;color:var(--mute)}
+footer a{color:inherit;text-decoration:none}
+footer a:hover{color:var(--fg)}
+.pop{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:30}
+.pop.go{animation:pop .5s ease-out}
+@keyframes pop{0%{opacity:.92}100%{opacity:0}}
+@media (max-width:640px){
+  body{padding-block:22px 18px}
+  .hero{width:128px;margin-top:20px}
+  .beltwrap{width:100%}
+  .row{gap:8px 18px}
+  .cws{margin-top:16px}
+  footer{justify-content:center;margin-top:26px}
+}
+@media (prefers-reduced-motion:reduce){.pop.go{animation:none}}
+</style>
+
+<div id="root"></div>
+<div class="pop" id="pop"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+<script>
+(function(){
+'use strict';
+/* Klaviyo: paste the public key (site ID) and the "Drop 001" list ID. Empty = simulated signup. */
+var KLAVIYO={publicKey:'',listId:''};
+
+var h=htm.bind(React.createElement), useState=React.useState, useRef=React.useRef, useEffect=React.useEffect;
+
+/* Colorways. Hex values are preliminary, matched to the tech pack. */
+var CW=[
+  {id:'01',name:'BLACK / OLIVE',a:{n:'BLACK',c:'#232323'},b:{n:'OLIVE',c:'#777963'},star:'#0F0F0F',hw:'#191919',edge:'#121212',flash:true,light:false},
+  {id:'02',name:'BLACK / BROWN',a:{n:'BLACK',c:'#232323'},b:{n:'BROWN',c:'#49372B'},star:'#0F0F0F',hw:'#191919',edge:'#121212',flash:true,light:false},
+  {id:'03',name:'BONE / TAUPE',a:{n:'BONE',c:'#D8D0C1'},b:{n:'TAUPE',c:'#A58F79'},star:'#C9B79C',hw:'#C8B79F',edge:'#B9AA91',flash:false,light:true}
+];
+
+/* Size M geometry from the tech pack, mm. R = 0 where the leather leaves the clip. */
+var HOLES=[0,1,2,3,4,5].map(function(i){return 850+(i-2.5)*25.5});
+var TIP=HOLES[5]+160, STARS=[];
+for(var x=114;x<=HOLES[0]-32-12.75;x+=65)STARS.push(x);
+var STRAP='M-2,0 H'+(TIP-17.5)+' A17.5,17.5 0 0 1 '+(TIP-17.5)+',35 H-2 Z';
+
+function starPts(w,rot){
+  var D=Math.PI/180,R=w/(2*Math.cos(18*D)),r=R*.382,p=[],i;
+  for(i=0;i<10;i++){var a=(-90+i*36+(rot?180:0))*D,rr=i%2?r:R;p.push([rr*Math.cos(a),rr*Math.sin(a)])}
+  var ys=p.map(function(q){return q[1]}),off=-(Math.min.apply(0,ys)+Math.max.apply(0,ys))/2;
+  return p.map(function(q){return q[0].toFixed(2)+','+(q[1]+off).toFixed(2)}).join(' ');
+}
+var BUCKLE=starPts(74,false), STAR_A=starPts(25.5,false), STAR_B=starPts(25.5,true);
+
+function Buckle(p){
+  var c=p.cw,id=p.id,L=c.light;
+  return h`<g transform=${'translate('+(p.cx||0)+','+(p.cy||0)+')'}>
+    <defs>
+      <linearGradient id=${id+'rim'} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor="#fff" stopOpacity=${L?.6:.26}/><stop offset=".5" stopColor="#fff" stopOpacity="0"/><stop offset="1" stopColor="#fff" stopOpacity=${L?.1:.05}/></linearGradient>
+      <linearGradient id=${id+'sh'} x1="0" y1="0" x2=".8" y2="1">
+        <stop offset="0" stopColor="#fff" stopOpacity=${L?.2:.07}/><stop offset=".45" stopColor="#fff" stopOpacity="0"/><stop offset="1" stopColor="#000" stopOpacity=${L?.2:.4}/></linearGradient>
+      <radialGradient id=${id+'lit'} cx=".46" cy=".44" r=".66">
+        <stop offset="0" stopColor="#fff"/><stop offset=".55" stopColor="#ECEDEF"/><stop offset="1" stopColor="#A8ACB2"/></radialGradient>
+    </defs>
+    <polygon points=${BUCKLE} fill="none" stroke=${'url(#'+id+'rim)'} strokeWidth="5.4" strokeLinejoin="round"/>
+    <polygon points=${BUCKLE} fill=${c.hw} stroke=${c.hw} strokeWidth="4" strokeLinejoin="round"/>
+    <polygon points=${BUCKLE} fill=${'url(#'+id+'sh)'} stroke=${'url(#'+id+'sh)'} strokeWidth="4" strokeLinejoin="round"/>
+    <polygon points=${BUCKLE} fill=${'url(#'+id+'lit)'} stroke=${'url(#'+id+'lit)'} strokeWidth="4" strokeLinejoin="round" style=${{opacity:p.lit?1:0,transition:'opacity .16s'}}/>
+  </g>`;
+}
+
+function Belt(p){
+  var c=p.cw,f=p.side==='a'?c.a:c.b,L=c.light,sp=p.side==='a'?STAR_A:STAR_B;
+  var vb=p.view==='detail'?'-44 -26 400 88':'-44 -26 1130 88';
+  return h`<svg class="belt" style=${{overflow:p.view==='detail'?'hidden':'visible'}} viewBox=${vb} role="img" aria-label=${c.name+', '+f.n+' side showing, size M'}>
+    <defs>
+      <clipPath id="strapClip"><path d=${STRAP}/></clipPath>
+      <clipPath id="starClip"><polygon points=${sp}/></clipPath>
+      <filter id="grain" filterUnits="userSpaceOnUse" x="-31" y="-1" width="1122" height="37" colorInterpolationFilters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="1.2 1.6" numOctaves="3" seed="9" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 0 1" result="g"/>
+        <feComposite in="SourceGraphic" in2="g" operator="arithmetic" k1="0" k2="1" k3=${L?.16:.2} k4=${L?-.08:-.1} result="t"/>
+        <feComposite in="t" in2="SourceGraphic" operator="in"/>
+      </filter>
+      <linearGradient id="round" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor="#fff" stopOpacity=${L?.18:.11}/><stop offset=".14" stopColor="#fff" stopOpacity=${L?.04:.03}/>
+        <stop offset=".55" stopColor="#000" stopOpacity="0"/><stop offset=".9" stopColor="#000" stopOpacity=${L?.1:.2}/><stop offset="1" stopColor="#000" stopOpacity=${L?.2:.38}/></linearGradient>
+      <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor=${L?'#5a4630':'#000'} stopOpacity=${L?.45:.75}/><stop offset=".55" stopColor="#000" stopOpacity="0"/></linearGradient>
+      <linearGradient id="kp" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stopColor="#fff" stopOpacity=${L?.28:.1}/><stop offset=".35" stopColor="#fff" stopOpacity="0"/><stop offset="1" stopColor="#000" stopOpacity=${L?.18:.38}/></linearGradient>
+    </defs>
+    <path d=${STRAP} fill=${f.c} filter="url(#grain)"/>
+    <g clipPath="url(#strapClip)">
+      <rect x="-30" y="0" width="1120" height="35" fill="url(#round)"/>
+    </g>
+    ${STARS.map(function(x){return h`<g key=${x} transform=${'translate('+x+',17.5)'}>
+      <polygon points=${sp} fill=${c.star}/>
+      <polygon points=${sp} fill="none" stroke="url(#wall)" strokeWidth="2.6" clipPath="url(#starClip)"/>
+      <polygon points=${sp} fill="none" stroke="#fff" strokeOpacity=${L?.3:.06} strokeWidth=".3" strokeLinejoin="round"/>
+    </g>`})}
+    ${HOLES.map(function(x){return h`<g key=${x}>
+      <circle cx=${x} cy="17.5" r="2" fill="#0D0D0D"/>
+      <circle cx=${x} cy="17.5" r="2.1" fill="none" stroke="#fff" strokeOpacity=${L?.32:.07} strokeWidth=".35"/>
+    </g>`})}
+    <line x1="-2" y1=".9" x2=${TIP-19} y2=".9" stroke="#fff" strokeOpacity=${L?.28:.07} strokeWidth=".35"/>
+    <path d=${STRAP} fill="none" stroke=${c.edge} strokeWidth="1"/>
+    <g>
+      <rect x="60.5" y="-2.7" width="9" height="40.4" rx="1.4" fill=${c.hw}/>
+      <rect x="60.5" y="-2.7" width="9" height="40.4" rx="1.4" fill="url(#kp)"/>
+      <rect x="60.5" y="-2.7" width="9" height="40.4" rx="1.4" fill="none" stroke="#fff" strokeOpacity=${L?.35:.09} strokeWidth=".3"/>
+    </g>
+    <${Buckle} cw=${c} id="bb" cx=${8} cy=${17.5} lit=${p.lit}/>
+  </svg>`;
+}
+
+function App(){
+  var mobile=typeof matchMedia==='function'&&matchMedia('(max-width: 640px)').matches;
+  var _c=useState(0),ci=_c[0],setCi=_c[1];
+  var _s=useState('a'),side=_s[0],setSide=_s[1];
+  var _v=useState(mobile?'detail':'full'),view=_v[0],setView=_v[1];
+  var _l=useState(false),lit=_l[0],setLit=_l[1];
+  var _e=useState(''),email=_e[0],setEmail=_e[1];
+  var _z=useState(''),size=_z[0],setSize=_z[1];
+  var _st=useState('idle'),status=_st[0],setStatus=_st[1];
+  var _m=useState(''),msg=_m[0],setMsg=_m[1];
+  var wrap=useRef(null),busy=useRef(false),litT=useRef(0);
+  var cw=CW[ci],face=side==='a'?cw.a:cw.b;
+
+  function flip(){
+    if(busy.current)return;
+    var el=wrap.current,reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduce||!el||!el.animate){setSide(function(s){return s==='a'?'b':'a'});return}
+    busy.current=true;
+    el.animate([{transform:'scaleY(1)'},{transform:'scaleY(.02)'}],{duration:200,easing:'cubic-bezier(.55,0,.8,.3)',fill:'forwards'}).finished.then(function(){
+      setSide(function(s){return s==='a'?'b':'a'});
+      requestAnimationFrame(function(){
+        el.animate([{transform:'scaleY(.02)'},{transform:'scaleY(1)'}],{duration:200,easing:'cubic-bezier(.2,.7,.45,1)',fill:'forwards'}).finished.then(function(){busy.current=false});
+      });
+    });
+  }
+  function flash(){
+    var pop=document.getElementById('pop');pop.classList.remove('go');void pop.offsetWidth;pop.classList.add('go');
+    if(!cw.flash)return;
+    clearTimeout(litT.current);setLit(true);litT.current=setTimeout(function(){setLit(false)},1500);
+  }
+  function submit(e){
+    e.preventDefault();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())){setStatus('error');setMsg('ENTER A VALID EMAIL');return}
+    setMsg('');
+    if(!KLAVIYO.publicKey||!KLAVIYO.listId){setStatus('done');return}
+    setStatus('sending');
+    var props={drop001_colorway:cw.id+' '+cw.name};if(size)props.drop001_size=size;
+    fetch('https://a.klaviyo.com/client/subscriptions/?company_id='+encodeURIComponent(KLAVIYO.publicKey),{
+      method:'POST',headers:{'Content-Type':'application/json',revision:'2024-10-15'},
+      body:JSON.stringify({data:{type:'subscription',attributes:{profile:{data:{type:'profile',attributes:{email:email.trim(),properties:props}}}},relationships:{list:{data:{type:'list',id:KLAVIYO.listId}}}}})
+    }).then(function(r){if(r.ok||r.status===202)setStatus('done');else{setStatus('error');setMsg('SOMETHING WENT WRONG. TRY AGAIN.')}})
+      .catch(function(){setStatus('error');setMsg('NO CONNECTION. TRY AGAIN.')});
+  }
+  useEffect(function(){return function(){clearTimeout(litT.current)}},[]);
+
+  return h`<main>
+    <h1 class="logo" aria-label="KWL"><svg viewBox="0 0 825 145" aria-hidden="true"><path fill-rule="evenodd" d="M451.5,143.4C440.6,139.3 437.8,130.8 442.3,115.0C443.8,109.7 447.0,97.8 449.1,89.6C451.1,81.7 449.9,82.8 417.8,117.6C398.3,138.7 394.8,141.2 381.0,143.0C375.1,143.7 341.7,144.0 273.0,143.8C174.8,143.5 173.5,143.5 170.0,141.5C166.0,139.1 164.5,136.4 160.0,123.0C158.3,117.8 156.2,112.1 155.4,110.3C154.6,108.6 154.0,106.7 154.0,106.0C154.0,105.4 153.2,103.0 152.1,100.7C151.1,98.4 150.0,95.7 149.7,94.8C147.9,89.7 140.4,92.0 135.6,99.2C133.7,102.1 129.8,107.6 127.1,111.5C124.4,115.4 119.3,122.5 115.9,127.5C107.3,140.1 105.6,141.7 99.8,142.9C93.5,144.3 12.8,144.4 8.1,143.0C-3.0,139.9 -2.9,133.3 8.2,117.8C12.6,111.6 17.3,105.2 18.4,103.6C19.6,101.9 22.8,97.6 25.5,93.9C31.5,85.8 38.0,76.9 50.5,59.5C55.7,52.4 62.0,43.6 64.6,40.0C73.6,27.7 78.2,21.5 84.0,13.5C88.5,7.2 90.9,4.8 95.0,2.7L100.2,0.0L141.0,0.0C178.0,0.0 182.1,0.2 184.9,1.8C190.2,4.7 189.8,10.4 184.1,16.7C183.2,17.7 180.0,21.9 177.0,26.0C174.0,30.1 171.3,33.7 171.0,34.0C170.4,34.6 168.3,37.6 162.0,46.8C157.7,53.0 157.2,56.9 160.7,55.6C161.7,55.2 169.8,50.3 178.7,44.7C187.7,39.1 197.4,33.1 200.2,31.3C203.1,29.6 205.9,27.7 206.5,27.3C210.4,24.0 244.2,3.4 247.2,2.6C249.2,2.0 251.2,1.1 251.6,0.7C252.0,0.3 288.2,0.0 332.1,0.0L411.8,0.0L414.9,2.9C418.6,6.4 419.2,12.2 416.2,16.1C415.2,17.4 412.5,21.6 410.3,25.5C408.1,29.4 403.2,37.4 399.5,43.5C387.2,63.5 387.5,62.9 389.8,65.2C393.9,69.3 395.8,68.0 426.0,39.6C451.0,16.2 466.5,2.4 469.2,1.3C474.4,-0.9 523.3,-0.5 526.8,1.7C533.5,6.0 533.5,8.6 526.9,21.5C503.8,66.8 504.7,64.7 507.5,67.0C511.6,70.4 515.7,67.1 549.5,34.0C561.0,22.6 573.0,11.1 576.0,8.3C585.2,-0.1 584.9,-0.0 612.9,0.0L637.5,0.0L641.3,3.1C647.6,8.3 647.1,9.7 630.2,33.3C622.1,44.7 612.1,58.8 608.0,64.7C603.9,70.6 598.7,77.9 596.6,80.9C594.4,84.0 589.5,91.2 585.5,97.0C581.6,102.8 577.4,108.9 576.1,110.6C572.4,115.6 573.4,119.5 578.4,119.5C582.6,119.5 582.8,119.2 599.8,94.0C602.9,89.3 605.9,85.0 606.5,84.3C607.8,82.8 611.0,78.1 628.0,52.5C635.7,40.9 642.4,30.8 643.0,30.0C643.6,29.2 646.7,24.4 649.9,19.5C662.7,-0.0 662.6,0.0 706.0,0.0C743.4,0.0 745.7,0.3 748.0,6.1C750.2,11.4 749.4,12.9 730.4,40.0C718.5,56.9 717.0,58.9 710.8,67.5C696.5,87.2 696.2,87.9 700.0,90.0C701.4,90.8 720.2,91.2 759.3,91.3C821.6,91.5 819.4,91.3 823.0,97.3C826.3,102.7 825.6,104.6 814.9,120.5C803.0,138.2 802.6,138.7 797.9,141.1C792.3,143.9 790.1,143.9 617.5,144.4C476.7,144.8 455.0,144.6 451.5,143.4ZM290.4,109.0C291.6,106.0 296.3,97.6 300.7,90.5C305.2,83.4 310.4,75.0 312.3,72.0C323.6,53.9 338.0,29.1 338.0,27.7C338.0,25.2 335.1,23.0 331.7,23.0C327.2,23.1 314.9,27.3 308.1,31.1C301.9,34.6 286.2,43.3 276.0,48.8C245.5,65.3 241.0,68.5 241.0,74.1C241.0,77.4 241.6,78.3 246.2,82.1C249.1,84.5 254.4,89.2 258.0,92.6C284.9,118.0 286.4,118.8 290.4,109.0Z"/></svg></h1>
+
+    <button type="button" class="hero" onClick=${flip} aria-label=${'Flip the belt. '+face.n+' side showing'}>
+      <svg viewBox="-44 -44 88 88" aria-hidden="true"><${Buckle} cw=${cw} id="hb" lit=${lit}/></svg>
+    </button>
+    <button type="button" class="name" onClick=${flash} aria-label="Flash. Take a flash photo of the buckle">FLASH</button>
+
+    <div class="beltwrap" ref=${wrap}><${Belt} cw=${cw} side=${side} view=${view} lit=${lit}/></div>
+
+    <div class="row cws" role="group" aria-label="Colorway">
+      ${CW.map(function(c,i){return h`<button type="button" key=${c.id} aria-pressed=${String(i===ci)} onClick=${function(){setCi(i);setSide('a')}}>${c.id+' '+c.name}</button>`})}
+    </div>
+    <div class="ctl">
+      <div class="views" role="group" aria-label="View">
+        <button type="button" aria-pressed=${String(view==='full')} onClick=${function(){setView('full')}}>FULL</button>
+        <button type="button" aria-pressed=${String(view==='detail')} onClick=${function(){setView('detail')}}>DETAIL</button>
+      </div>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="flip" onClick=${flip}><span class="k">${face.n} · </span>FLIP ↻</button>
+    </div>
+
+    <div class="drop"><b>DROP 001</b> / TBA</div>
+
+    ${status==='done'
+      ? h`<div class="done" aria-live="polite"><span>YOU'RE ON THE LIST.</span><span class="k">DROP 001 / TBA</span></div>`
+      : h`<form onSubmit=${submit} noValidate>
+          <label class="field ${status==='error'?'err':''}">
+            <span style=${{position:'absolute',width:'1px',height:'1px',overflow:'hidden',clip:'rect(0 0 0 0)'}}>Email</span>
+            <input id="email" type="email" inputMode="email" autoComplete="email" placeholder="EMAIL" value=${email} onInput=${function(e){setEmail(e.target.value);if(status==='error'){setStatus('idle');setMsg('')}}}/>
+          </label>
+          <div class="sizes" role="group" aria-label="Size, optional">
+            ${['XS','S','M','L'].map(function(z){return h`<button type="button" key=${z} aria-pressed=${String(size===z)} onClick=${function(){setSize(size===z?'':z)}}>${z}</button>`})}
+          </div>
+          <button type="submit" class="send" disabled=${status==='sending'}>${status==='sending'?'SENDING…':'NOTIFY ME →'}</button>
+          <div class="msg" aria-live="polite">${msg}</div>
+          <p class="fine">Your email is only used for drop alerts. Size and colorway are optional and help us decide how many to make.</p>
+        </form>`}
+
+    <footer>
+      <span>KWL STUDIO</span><span>CHICAGO</span>
+      <a href="https://instagram.com/kwlstudio" target="_blank" rel="noopener">@KWLSTUDIO</a>
+      <span>CONTACT@KWLSTUDIO.SHOP</span>
+    </footer>
+  </main>`;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h`<${App}/>`);
+})();
+</script>
