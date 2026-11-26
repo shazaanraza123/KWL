@@ -6,13 +6,12 @@ import {
   HOLES,
   KEEPER,
   STAR_A,
-  STAR_B,
   STARS,
   STRAP,
   TIP,
   VIEWBOX,
 } from "@/lib/belt";
-import type { BeltView, Colorway, Side } from "@/lib/colorways";
+import { isLightHardware, type BeltView, type Colorway, type Side } from "@/lib/colorways";
 import { Buckle } from "./Buckle";
 
 export type BeltProps = {
@@ -25,15 +24,17 @@ export type BeltProps = {
 export function Belt({ colorway: c, side, view, lit = false }: BeltProps) {
   const uid = useId().replace(/:/g, "");
   const face = side === "a" ? c.a : c.b;
-  const L = c.light;
-  const sp = side === "a" ? STAR_A : STAR_B;
-  const vb = view === "detail" ? VIEWBOX.detail : VIEWBOX.full;
+  const L = isLightHardware(c);
+  // Stars stay point-up on screen for both faces. Side B's 180° cut
+  // geometry belongs in the real flip (phase 2); swapping it here made them tip down.
+  const sp = STAR_A;
+  const vb = view === "closed" ? VIEWBOX.closed : VIEWBOX.flat;
   const buckleId = `${uid}bb`;
 
   return (
     <svg
       className="belt"
-      style={{ overflow: view === "detail" ? "hidden" : "visible" }}
+      style={{ overflow: view === "closed" ? "hidden" : "visible" }}
       viewBox={vb}
       role="img"
       aria-label={`${c.name}, ${face.n} side showing, size M`}
