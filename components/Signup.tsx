@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { SIZES, type Colorway, type Size } from "@/lib/colorways";
+import type { Colorway } from "@/lib/colorways";
+import { SIZES, type Size } from "@/lib/sizes";
 import { subscribe } from "@/lib/klaviyo";
+import { SizeGuide } from "./SizeGuide";
 
 type Props = {
   colorway: Colorway;
@@ -15,6 +17,7 @@ export function Signup({ colorway }: Props) {
   const [size, setSize] = useState<Size | "">("");
   const [status, setStatus] = useState<Status>("idle");
   const [msg, setMsg] = useState("");
+  const [guide, setGuide] = useState(false);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -75,6 +78,16 @@ export function Signup({ colorway }: Props) {
           </button>
         ))}
       </div>
+      <button
+        type="button"
+        className="guideBtn"
+        aria-expanded={guide}
+        aria-controls="size-guide"
+        onClick={() => setGuide((g) => !g)}
+      >
+        SIZE GUIDE
+      </button>
+      {guide && <SizeGuide onClose={() => setGuide(false)} onPick={setSize} />}
       <button type="submit" className="send" disabled={status === "sending"}>
         {status === "sending" ? "SENDING…" : "NOTIFY ME →"}
       </button>

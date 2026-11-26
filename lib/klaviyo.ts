@@ -1,4 +1,5 @@
-import type { Colorway, Size } from "./colorways";
+import type { Colorway } from "./colorways";
+import type { Size } from "./sizes";
 
 export type SubscribeInput = {
   email: string;

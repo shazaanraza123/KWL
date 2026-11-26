@@ -13,11 +13,11 @@ export function BeltControls({ view, faceName, onView, onFlip }: Props) {
   return (
     <div className="ctl">
       <div className="views" role="group" aria-label="View">
-        <button type="button" aria-pressed={view === "full"} onClick={() => onView("full")}>
-          FULL
+        <button type="button" aria-pressed={view === "closed"} onClick={() => onView("closed")}>
+          CLOSED
         </button>
-        <button type="button" aria-pressed={view === "detail"} onClick={() => onView("detail")}>
-          DETAIL
+        <button type="button" aria-pressed={view === "flat"} onClick={() => onView("flat")}>
+          FLAT
         </button>
       </div>
       <span className="sep" aria-hidden="true" />

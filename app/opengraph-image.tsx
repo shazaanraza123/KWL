@@ -1,7 +1,13 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
-import { BUCKLE_POINTS } from "@/lib/belt";
+
+const BUCKLE_POINTS = Array.from({ length: 10 }, (_, i) => {
+  const R = 74 / (2 * Math.cos(Math.PI / 10));
+  const r = (i % 2 ? 0.382 : 1) * R;
+  const a = ((-90 + i * 36) * Math.PI) / 180;
+  return `${(r * Math.cos(a)).toFixed(2)},${(r * Math.sin(a) + 3.6).toFixed(2)}`;
+}).join(" ");
 
 export const runtime = "nodejs";
 export const alt = "KWL STUDIO";
