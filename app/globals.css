@@ -27,7 +27,7 @@ body {
   -webkit-font-smoothing: antialiased;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 28px 22px;
+  padding-block: 22px 18px;
 }
 
 button,
@@ -68,18 +68,9 @@ main {
   align-items: center;
 }
 
-.logo {
-  width: 110px;
-  aspect-ratio: 825 / 145;
-  margin: 0;
-  background: var(--fg);
-  -webkit-mask: url(/kwl-wordmark.svg) center / contain no-repeat;
-  mask: url(/kwl-wordmark.svg) center / contain no-repeat;
-}
-
 .hero {
-  margin-top: 26px;
-  width: 180px;
+  margin-top: 0;
+  width: 150px;
   max-width: 100%;
   aspect-ratio: 1;
   display: block;
@@ -105,7 +96,7 @@ main {
 }
 
 .beltwrap {
-  margin-top: 18px;
+  margin-top: 12px;
   width: min(1100px, 84vw);
   max-width: 100%;
   transform-origin: 50% 48%;
@@ -126,7 +117,7 @@ main {
 }
 
 .cws {
-  margin-top: 22px;
+  margin-top: 16px;
 }
 
 .cws button,
@@ -170,7 +161,7 @@ main {
 }
 
 .drop {
-  margin-top: 24px;
+  margin-top: 18px;
   color: var(--mute);
 }
 
@@ -233,6 +224,178 @@ form,
   text-decoration: underline;
   text-underline-offset: 7px;
   text-decoration-thickness: 1px;
+}
+
+.sizeguide-toggle {
+  color: var(--mute);
+  min-height: 30px;
+  padding: 7px 6px;
+  font-size: 10px;
+}
+
+.sizeguide-toggle:hover,
+.sizeguide-toggle[aria-expanded="true"] {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 1px;
+}
+
+.sizeguide {
+  width: 100%;
+  max-width: 340px;
+  align-self: stretch;
+  margin-inline: auto;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+
+.sizeguide-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--fg);
+  font-size: 10px;
+}
+
+.sizeguide-close {
+  color: var(--mute);
+  min-height: 44px;
+  padding-inline: 4px;
+}
+
+.sizeguide-close:hover {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+.finder {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.finder-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.finder-label {
+  color: var(--mute);
+  min-width: 72px;
+  font-size: 10px;
+}
+
+.finder-row button {
+  color: var(--mute);
+  min-height: 44px;
+  padding-inline: 2px;
+  font-size: 10px;
+}
+
+.finder-row button[aria-pressed="true"] {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 1px;
+}
+
+.jeans-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  flex: 1;
+}
+
+.measure-row input {
+  flex: 1;
+  min-width: 88px;
+  min-height: 44px;
+  border-bottom: 1px solid var(--line);
+  text-align: center;
+  outline: none;
+  color: var(--fg);
+}
+
+.measure-row input:focus {
+  border-color: var(--fg);
+}
+
+.measure-row input::placeholder {
+  color: var(--mute);
+}
+
+.unit {
+  display: flex;
+  gap: 10px;
+}
+
+.finder-out {
+  margin: 4px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--fg);
+}
+
+.finder-line {
+  color: var(--mute);
+}
+
+.finder-note {
+  margin: 0;
+  font-size: 10px;
+  color: var(--mute);
+  line-height: 1.5;
+}
+
+.chart-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chart {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.chart th,
+.chart td {
+  padding: 6px 4px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+  font-weight: 400;
+  color: var(--mute);
+}
+
+.chart thead th {
+  color: var(--fg);
+}
+
+.chart tbody th {
+  color: var(--fg);
+}
+
+.chart tr.is-rec th,
+.chart tr.is-rec td {
+  color: var(--fg);
+}
+
+.chart-notes {
+  margin: 0;
+  font-size: 9px;
+  line-height: 1.55;
+  letter-spacing: 0.04em;
+  color: var(--mute);
 }
 
 .send {
@@ -322,7 +485,11 @@ footer a:hover {
 
   .hero {
     width: 128px;
-    margin-top: 20px;
+    margin-top: 0;
+  }
+
+  .sizeguide {
+    max-width: 100%;
   }
 
   .beltwrap {

@@ -1,4 +1,4 @@
-import type { Colorway } from "@/lib/colorways";
+import { isLightHex, type Colorway } from "@/lib/colorways";
 import { BUCKLE_POINTS } from "@/lib/belt";
 
 type Props = {
@@ -10,7 +10,7 @@ type Props = {
 };
 
 export function Buckle({ cw, id, cx = 0, cy = 0, lit = false }: Props) {
-  const L = cw.light;
+  const L = isLightHex(cw.hw);
   return (
     <g transform={`translate(${cx},${cy})`}>
       <defs>

@@ -18,8 +18,8 @@ export const KEEPER = { x: 60.5, y: -2.7, w: 9, h: 40.4, rx: 1.4 };
 export const BUCKLE = { cx: 8, cy: 17.5, w: 74, stroke: 4 };
 
 export const VIEWBOX = {
-  full: "-44 -26 1130 88",
-  detail: "-44 -26 400 88",
+  closed: "-44 -26 400 88",
+  flat: "-44 -26 1130 88",
 } as const;
 
 export function starPoints(w: number, rotated = false): string {

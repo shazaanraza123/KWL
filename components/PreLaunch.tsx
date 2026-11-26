@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { COLORWAYS, type BeltView, type Side } from "@/lib/colorways";
 import { Belt } from "./Belt";
 import { BeltControls } from "./BeltControls";
@@ -9,27 +9,10 @@ import { ColorwayPicker } from "./ColorwayPicker";
 import { FlashPop, type FlashPopHandle } from "./FlashPop";
 import { Signup } from "./Signup";
 
-function subscribeMobile(onChange: () => void) {
-  const mql = window.matchMedia("(max-width: 640px)");
-  mql.addEventListener("change", onChange);
-  return () => mql.removeEventListener("change", onChange);
-}
-
-function useMobileDefaultView(): BeltView {
-  const mobile = useSyncExternalStore(
-    subscribeMobile,
-    () => window.matchMedia("(max-width: 640px)").matches,
-    () => false,
-  );
-  return mobile ? "detail" : "full";
-}
-
 export function PreLaunch() {
   const [ci, setCi] = useState(0);
   const [side, setSide] = useState<Side>("a");
-  const defaultView = useMobileDefaultView();
-  const [viewOverride, setViewOverride] = useState<BeltView | null>(null);
-  const view = viewOverride ?? defaultView;
+  const [view, setView] = useState<BeltView>("closed");
   const [lit, setLit] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
   const busy = useRef(false);
@@ -95,8 +78,6 @@ export function PreLaunch() {
   return (
     <>
       <main>
-        <h1 className="logo" aria-label="KWL" />
-
         <button
           type="button"
           className="hero"
@@ -122,7 +103,7 @@ export function PreLaunch() {
         </div>
 
         <ColorwayPicker index={ci} onChange={pickColorway} />
-        <BeltControls view={view} faceName={face.n} onView={setViewOverride} onFlip={flip} />
+        <BeltControls view={view} faceName={face.n} onView={setView} onFlip={flip} />
 
         <div className="drop">
           <b>DROP 001</b> / TBA
